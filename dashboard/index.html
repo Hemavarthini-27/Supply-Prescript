@@ -203,7 +203,20 @@
             Predict Shipment Delay
         </button>
 
-        <div id="result"></div>
+                <div id="result"></div>
+
+        <!-- Decision Analytics Section -->
+        <div class="card" id="analyticsCard">
+
+            <h2>Decision Analytics</h2>
+
+            <button onclick="loadDecisionAnalytics()">
+                Load Decision Analytics
+            </button>
+
+            <div id="analyticsResult"></div>
+
+        </div>
 
     </div>
 
@@ -421,6 +434,60 @@ document.getElementById("executeDecisionBtn").addEventListener("click", async ()
         );
 
         console.error(error);
+    }
+}
+
+async function loadDecisionAnalytics() {
+
+    const analyticsResult = document.getElementById("analyticsResult");
+
+    analyticsResult.innerHTML = "Loading analytics...";
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/decision-analytics"
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to load analytics");
+        }
+
+        const data = await response.json();
+
+        analyticsResult.innerHTML = `<div class="optimization-card">
+
+        <h3>Decision Analytics Results</h3>
+
+        <p>
+            <strong>Total Decisions:</strong>
+            ${data.total_decisions}
+        </p>
+
+        <p>
+            <strong>Total Cost:</strong>
+            £${Number(data.total_cost).toLocaleString()}
+        </p>
+
+        <p>
+            <strong>Average Predicted Delay:</strong>
+            ${data.average_predicted_delay} days
+        </p>
+
+        <p>
+            <strong>Most Recommended Action:</strong>
+            ${data.most_recommended_action}
+        </p>
+
+    </div>
+`;
+
+    } catch (error) {
+
+        console.error(error);
+
+        analyticsResult.innerHTML =
+            "Unable to load decision analytics.";
     }
 }
 

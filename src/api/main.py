@@ -5,8 +5,10 @@ import pandas as pd
 import pulp
 from datetime import datetime
 import os
+from database.database import create_tables, save_decision, get_connection
 
 app = FastAPI(title="Supply Prescript API")
+create_tables()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:5500", "http://localhost:5500"],
@@ -183,8 +185,62 @@ def execute_decision(data: dict):
             file_path,
             index=False
         )
+        # Save decision to SQLite database
+    save_decision(
+        shipment_id=data["Shipment_ID"],
+        predicted_delay=data["Predicted_Delay"],
+        recommended_action=data["Recommended_Action"],
+        predicted_cost=data["Predicted_Cost"]
+    )
 
     return {
         "message": "Decision executed and saved successfully!",
         "decision": decision_record
+    }
+@app.get("/decision-analytics")
+def decision_analytics():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Total number of decisions
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM executed_decisions
+    """)
+    total_decisions = cursor.fetchone()[0]
+
+    # Total estimated cost
+    cursor.execute("""
+        SELECT COALESCE(SUM(predicted_cost), 0)
+        FROM executed_decisions
+    """)
+    total_cost = cursor.fetchone()[0]
+
+    # Average predicted delay
+    cursor.execute("""
+        SELECT COALESCE(AVG(predicted_delay), 0)
+        FROM executed_decisions
+    """)
+    average_delay = cursor.fetchone()[0]
+
+    # Most frequently recommended action
+    cursor.execute("""
+        SELECT recommended_action, COUNT(*) AS action_count
+        FROM executed_decisions
+        GROUP BY recommended_action
+        ORDER BY action_count DESC
+        LIMIT 1
+    """)
+    result = cursor.fetchone()
+
+    most_recommended_action = result[0] if result else "No decisions yet"
+
+    conn.close()
+
+    return {
+        "total_decisions": total_decisions,
+        "total_cost": round(float(total_cost), 2),
+        "average_predicted_delay": round(float(average_delay), 2),
+        "most_recommended_action": most_recommended_action
     }
