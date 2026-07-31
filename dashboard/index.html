@@ -133,6 +133,74 @@
             margin-top: 10px;
             font-weight: bold;
 }
+        .alternatives-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.alternative-card {
+    padding: 15px;
+    background: #f8fafc;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+}
+
+.alternative-card h4 {
+    margin-top: 0;
+    font-size: 17px;
+}
+
+.alternative-card p {
+    margin: 8px 0;
+}
+
+.alternative-card.recommended {
+    border: 3px solid green;
+    background-color: #e8f5e9;
+}
+
+.alternative-card.infeasible {
+    border: 2px solid #dc2626;
+    background-color: #fee2e2;
+}
+
+@media (max-width: 800px) {
+    .alternatives-container {
+        grid-template-columns: 1fr;
+    }
+}
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.analytics-item {
+    background: #f8fafc;
+    padding: 18px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #d1d5db;
+}
+
+.analytics-item h3 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.analytics-item p {
+    margin-bottom: 0;
+    color: #555;
+}
+
+@media (max-width: 800px) {
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
     </style>
 </head>
 
@@ -345,34 +413,83 @@ resultBox.innerHTML = `
     </div>
 
     <div class="optimization-card">
-        <h3>Prescriptive Optimization</h3>
 
-        <p>
-            <strong>Selected Action:</strong>
-            ${result.optimization.action}
-        </p>
+    <h3>Prescriptive Optimization</h3>
 
-        <p>
-            <strong>Estimated Cost:</strong>
-            £${result.optimization.cost.toLocaleString()}
-        </p>
+    <p>
+        <strong>Recommended Action:</strong>
+        ${result.optimization.selected_action}
+    </p>
 
-        <p>
-            <strong>Expected Delay:</strong>
-            ${result.optimization.delay_days} days
-        </p>
+    <p>
+        <strong>Estimated Cost:</strong>
+        £${result.optimization.selected_cost.toLocaleString()}
+    </p>
 
-        <p>
-            <strong>Available Capacity:</strong>
-            ${result.optimization.capacity} units
-        </p>
+    <p>
+        <strong>Expected Delay:</strong>
+        ${result.optimization.selected_delay_days} days
+    </p>
 
-        <button id="executeDecisionBtn" class="execute-btn">
-            Execute Decision
-        </button>
+    <p>
+        <strong>Available Capacity:</strong>
+        ${result.optimization.selected_capacity} units
+    </p>
 
-        <p id="executionMessage"></p>
+    <h3>Optimization Alternatives</h3>
+
+    <div class="alternatives-container">
+
+        ${result.optimization.alternatives.map(option => `
+
+            <div class="alternative-card
+                ${option.recommended ? 'recommended' : ''}
+                ${!option.feasible ? 'infeasible' : ''}">
+
+                <h4>
+                    ${option.action}
+
+                    ${option.recommended
+                        ? ' ⭐ Recommended'
+                        : ''}
+                </h4>
+
+                <p>
+                    <strong>Cost:</strong>
+                    £${option.cost.toLocaleString()}
+                </p>
+
+                <p>
+                    <strong>Delay:</strong>
+                    ${option.delay_days} days
+                </p>
+
+                <p>
+                    <strong>Capacity:</strong>
+                    ${option.capacity} units
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+
+                    ${option.feasible
+                        ? '✓ Feasible'
+                        : '✗ Not Feasible'}
+                </p>
+
+            </div>
+
+        `).join('')}
+
     </div>
+
+    <button id="executeDecisionBtn" class="execute-btn">
+        Execute Recommended Decision
+    </button>
+
+    <p id="executionMessage"></p>
+
+</div>
 `;
 
 document.getElementById("executeDecisionBtn").addEventListener("click", async () => {
@@ -386,11 +503,11 @@ document.getElementById("executeDecisionBtn").addEventListener("click", async ()
     try {
 
         const decisionData = {
-            Shipment_ID: 1002,
-            Predicted_Delay: result.optimization.delay_days,
-            Recommended_Action: result.optimization.action,
-            Predicted_Cost: result.optimization.cost
-        };
+         Shipment_ID: 1002,
+         Predicted_Delay: result.optimization.selected_delay_days,
+         Recommended_Action: result.optimization.selected_action,
+         Predicted_Cost: result.optimization.selected_cost
+};
 
         const response = await fetch(
             "http://127.0.0.1:8000/execute-decision",
@@ -436,7 +553,6 @@ document.getElementById("executeDecisionBtn").addEventListener("click", async ()
         console.error(error);
     }
 }
-
 async function loadDecisionAnalytics() {
 
     const analyticsResult = document.getElementById("analyticsResult");
@@ -455,32 +571,45 @@ async function loadDecisionAnalytics() {
 
         const data = await response.json();
 
-        analyticsResult.innerHTML = `<div class="optimization-card">
+        analyticsResult.innerHTML = `
+            <div class="optimization-card">
 
-        <h3>Decision Analytics Results</h3>
+                <h3>Decision Analytics Results</h3>
 
-        <p>
-            <strong>Total Decisions:</strong>
-            ${data.total_decisions}
-        </p>
+                <p>
+                    <strong>Total Decisions:</strong>
+                    ${data.total_decisions}
+                </p>
 
-        <p>
-            <strong>Total Cost:</strong>
-            £${Number(data.total_cost).toLocaleString()}
-        </p>
+                <p>
+                    <strong>Total Cost:</strong>
+                    £${Number(data.total_cost).toLocaleString()}
+                </p>
 
-        <p>
-            <strong>Average Predicted Delay:</strong>
-            ${data.average_predicted_delay} days
-        </p>
+                <p>
+                    <strong>Average Predicted Delay:</strong>
+                    ${data.average_predicted_delay} days
+                </p>
 
-        <p>
-            <strong>Most Recommended Action:</strong>
-            ${data.most_recommended_action}
-        </p>
+                <p>
+                    <strong>Most Recommended Action:</strong>
+                    ${data.most_recommended_action}
+                </p>
 
-    </div>
-`;
+                <div class="card">
+
+                    <h2>🔄 Closed-Loop Decision Performance</h2>
+
+                    <div id="feedbackAnalytics">
+                        Loading feedback analytics...
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+        await loadFeedbackAnalytics();
 
     } catch (error) {
 
@@ -488,6 +617,80 @@ async function loadDecisionAnalytics() {
 
         analyticsResult.innerHTML =
             "Unable to load decision analytics.";
+    }
+}
+
+
+async function loadFeedbackAnalytics() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/feedback-analytics"
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to load feedback analytics");
+        }
+
+        const data = await response.json();
+
+        const analyticsBox =
+            document.getElementById("feedbackAnalytics");
+
+        analyticsBox.innerHTML = `
+
+            <div class="analytics-grid">
+
+                <div class="analytics-item">
+                    <h3>${data.total_evaluated}</h3>
+                    <p>Total Evaluated</p>
+                </div>
+
+                <div class="analytics-item">
+                    <h3>${data.successful}</h3>
+                    <p>Successful</p>
+                </div>
+
+                <div class="analytics-item">
+                    <h3>${data.partially_successful}</h3>
+                    <p>Partially Successful</p>
+                </div>
+
+                <div class="analytics-item">
+                    <h3>${data.unsuccessful}</h3>
+                    <p>Unsuccessful</p>
+                </div>
+
+                <div class="analytics-item">
+                    <h3>${data.success_rate}%</h3>
+                    <p>Success Rate</p>
+                </div>
+
+                <div class="analytics-item">
+                    <h3>£${Number(data.average_cost_difference).toLocaleString()}</h3>
+                    <p>Average Cost Difference</p>
+                </div>
+
+                <div class="analytics-item">
+                    <h3>${data.average_delay_difference} days</h3>
+                    <p>Average Delay Difference</p>
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.error(error);
+
+        const analyticsBox =
+            document.getElementById("feedbackAnalytics");
+
+        if (analyticsBox) {
+            analyticsBox.textContent =
+                "Unable to load feedback analytics.";
+        }
     }
 }
 

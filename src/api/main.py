@@ -5,7 +5,12 @@ import pandas as pd
 import pulp
 from datetime import datetime
 import os
-from database.database import create_tables, save_decision, get_connection
+from database.database import (
+    create_tables,
+    save_decision,
+    save_feedback,
+    get_connection
+)
 
 app = FastAPI(title="Supply Prescript API")
 create_tables()
@@ -70,7 +75,7 @@ def optimize_supply_chain():
         for action in actions
     }
 
-    # Minimize cost
+    # Objective: minimize cost
     problem += pulp.lpSum(
         actions[action]["cost"] * decision_vars[action]
         for action in actions
@@ -100,10 +105,10 @@ def optimize_supply_chain():
         for action in actions
     ) >= scenario["required_units"]
 
-    # Solve
+    # Solve optimization
     problem.solve(pulp.PULP_CBC_CMD(msg=False))
 
-    # Identify selected action
+    # Find selected action
     selected_action = None
 
     for action, variable in decision_vars.items():
@@ -111,13 +116,41 @@ def optimize_supply_chain():
             selected_action = action
             break
 
+    # Evaluate all alternatives against constraints
+    alternatives = []
+
+    for action, details in actions.items():
+
+        budget_ok = details["cost"] <= scenario["available_budget"]
+        delay_ok = details["delay_days"] <= scenario["maximum_acceptable_delay"]
+        capacity_ok = details["capacity"] >= scenario["required_units"]
+
+        feasible = budget_ok and delay_ok and capacity_ok
+
+        alternatives.append({
+            "action": action,
+            "cost": details["cost"],
+            "delay_days": details["delay_days"],
+            "capacity": details["capacity"],
+            "feasible": feasible,
+            "budget_ok": budget_ok,
+            "delay_ok": delay_ok,
+            "capacity_ok": capacity_ok,
+            "recommended": action == selected_action
+        })
+
     return {
-        "action": selected_action,
-        "cost": actions[selected_action]["cost"],
-        "delay_days": actions[selected_action]["delay_days"],
-        "capacity": actions[selected_action]["capacity"]
+        "selected_action": selected_action,
+        "selected_cost": actions[selected_action]["cost"],
+        "selected_delay_days": actions[selected_action]["delay_days"],
+        "selected_capacity": actions[selected_action]["capacity"],
+        "alternatives": alternatives,
+        "constraints": {
+            "required_units": scenario["required_units"],
+            "available_budget": scenario["available_budget"],
+            "maximum_acceptable_delay": scenario["maximum_acceptable_delay"]
+        }
     }
-    
 @app.post("/predict")
 def predict_delay(data: dict):
 
@@ -243,4 +276,111 @@ def decision_analytics():
         "total_cost": round(float(total_cost), 2),
         "average_predicted_delay": round(float(average_delay), 2),
         "most_recommended_action": most_recommended_action
+    }
+@app.post("/evaluate-decision")
+def evaluate_decision(data: dict):
+
+    decision_id = data["decision_id"]
+    shipment_id = data["shipment_id"]
+
+    predicted_delay = data["predicted_delay"]
+    actual_delay = data["actual_delay"]
+
+    predicted_cost = data["predicted_cost"]
+    actual_cost = data["actual_cost"]
+
+    feedback = save_feedback(
+        decision_id=decision_id,
+        shipment_id=shipment_id,
+        predicted_delay=predicted_delay,
+        actual_delay=actual_delay,
+        predicted_cost=predicted_cost,
+        actual_cost=actual_cost
+    )
+
+    return {
+        "message": "Decision evaluated successfully!",
+        "decision_id": decision_id,
+        "shipment_id": shipment_id,
+        "predicted_delay": predicted_delay,
+        "actual_delay": actual_delay,
+        "delay_difference": feedback["delay_difference"],
+        "predicted_cost": predicted_cost,
+        "actual_cost": actual_cost,
+        "cost_difference": feedback["cost_difference"],
+        "outcome": feedback["outcome"]
+    }
+@app.get("/feedback-analytics")
+def feedback_analytics():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Total evaluated decisions
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM decision_feedback
+    """)
+    total_evaluated = cursor.fetchone()[0]
+
+    # Successful decisions
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM decision_feedback
+        WHERE outcome = 'Successful'
+    """)
+    successful = cursor.fetchone()[0]
+
+    # Partially successful decisions
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM decision_feedback
+        WHERE outcome = 'Partially Successful'
+    """)
+    partially_successful = cursor.fetchone()[0]
+
+    # Unsuccessful decisions
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM decision_feedback
+        WHERE outcome = 'Unsuccessful'
+    """)
+    unsuccessful = cursor.fetchone()[0]
+
+    # Average cost difference
+    cursor.execute("""
+        SELECT COALESCE(AVG(cost_difference), 0)
+        FROM decision_feedback
+    """)
+    average_cost_difference = cursor.fetchone()[0]
+
+    # Average delay difference
+    cursor.execute("""
+        SELECT COALESCE(AVG(delay_difference), 0)
+        FROM decision_feedback
+    """)
+    average_delay_difference = cursor.fetchone()[0]
+
+    # Success rate
+    if total_evaluated > 0:
+        success_rate = (
+            successful / total_evaluated
+        ) * 100
+    else:
+        success_rate = 0
+
+    conn.close()
+
+    return {
+        "total_evaluated": total_evaluated,
+        "successful": successful,
+        "partially_successful": partially_successful,
+        "unsuccessful": unsuccessful,
+        "success_rate": round(success_rate, 2),
+        "average_cost_difference": round(
+            float(average_cost_difference), 2
+        ),
+        "average_delay_difference": round(
+            float(average_delay_difference), 2
+        )
     }
