@@ -11,6 +11,10 @@ from database.database import (
     save_feedback,
     get_connection
 )
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from xgboost import XGBClassifier
+from database.database import save_training_history
 
 app = FastAPI(title="Supply Prescript API")
 create_tables()
@@ -277,6 +281,67 @@ def decision_analytics():
         "average_predicted_delay": round(float(average_delay), 2),
         "most_recommended_action": most_recommended_action
     }
+    
+@app.post("/retrain-model")
+def retrain_model():
+
+    # Load dataset
+    dataset = pd.read_csv("data/processed/cleaned_supply_chain.csv")
+
+    # Target column
+    y = dataset["Late_delivery_risk"]
+
+    # Features
+    X = dataset.drop(columns=["Late_delivery_risk"])
+
+    # Transform using existing preprocessor
+    X_processed = preprocessor.transform(X)
+
+    # Train/Test Split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_processed,
+        y,
+        test_size=0.2,
+        random_state=42
+    )
+
+    # Train updated model
+    new_model = XGBClassifier(
+        random_state=42,
+        n_estimators=200,
+        max_depth=6,
+        learning_rate=0.1
+    )
+
+    new_model.fit(X_train, y_train)
+
+    # Evaluate accuracy
+    predictions = new_model.predict(X_test)
+
+    accuracy = accuracy_score(
+        y_test,
+        predictions
+    )
+
+    # Save updated model
+    joblib.dump(
+        new_model,
+        "models/xgboost_delay_model.pkl"
+    )
+
+    # Save training history
+    save_training_history(
+        model_version="v1.1",
+        accuracy=round(accuracy * 100, 2),
+        trigger_reason="Closed-loop feedback"
+    )
+
+    return {
+        "message": "Model retrained successfully!",
+        "accuracy": round(accuracy * 100, 2),
+        "model_version": "v1.1"
+    }
+
 @app.post("/evaluate-decision")
 def evaluate_decision(data: dict):
 

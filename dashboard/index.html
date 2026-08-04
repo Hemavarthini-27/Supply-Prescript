@@ -554,7 +554,6 @@ document.getElementById("executeDecisionBtn").addEventListener("click", async ()
     }
 }
 async function loadDecisionAnalytics() {
-
     const analyticsResult = document.getElementById("analyticsResult");
 
     analyticsResult.innerHTML = "Loading analytics...";
@@ -572,6 +571,7 @@ async function loadDecisionAnalytics() {
         const data = await response.json();
 
         analyticsResult.innerHTML = `
+
             <div class="optimization-card">
 
                 <h3>Decision Analytics Results</h3>
@@ -596,19 +596,28 @@ async function loadDecisionAnalytics() {
                     ${data.most_recommended_action}
                 </p>
 
-                <div class="card">
+            </div>
 
-                    <h2>🔄 Closed-Loop Decision Performance</h2>
+            <div class="card">
 
-                    <div id="feedbackAnalytics">
-                        Loading feedback analytics...
-                    </div>
+                <h2>🔄 Closed-Loop Decision Performance</h2>
 
+                <div id="feedbackAnalytics">
+                    Loading feedback analytics...
                 </div>
 
+                <br>
+
+               <button type="button" onclick="retrainModel()">
+    🔄 Retrain Model
+</button>
+                <div id="retrainResult"></div>
+
             </div>
+
         `;
 
+        // Load feedback analytics after HTML is created
         await loadFeedbackAnalytics();
 
     } catch (error) {
@@ -619,8 +628,6 @@ async function loadDecisionAnalytics() {
             "Unable to load decision analytics.";
     }
 }
-
-
 async function loadFeedbackAnalytics() {
 
     try {
@@ -692,6 +699,62 @@ async function loadFeedbackAnalytics() {
                 "Unable to load feedback analytics.";
         }
     }
+}
+
+async function retrainModel() {
+
+    console.log("Retrain button clicked");
+
+    try {
+
+        
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/retrain-model",
+            {
+                method: "POST"
+            }
+        );
+
+        
+
+        if (!response.ok) {
+            throw new Error("Retraining failed");
+        }
+
+        const data = await response.json();
+
+        console.log("Data:", data);
+        console.log("Displaying retrain result");
+
+        document.getElementById("retrainResult").innerHTML = `
+            <div class="optimization-card">
+                <h3>✅ Model Retrained Successfully</h3>
+
+                <p><strong>Version:</strong> ${data.model_version}</p>
+
+                <p><strong>Accuracy:</strong> ${data.accuracy}%</p>
+
+                <p>${data.message}</p>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+    console.error("Retrain Error:", error);
+    alert(error);
+
+    document.getElementById("retrainResult").innerHTML = `
+        <div class="recommendation-card">
+            <h3>❌ Retrain Failed</h3>
+            <p>${error.message}</p>
+        </div>
+    `;
+
+
+    }
+
 }
 
 </script>

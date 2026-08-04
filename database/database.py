@@ -23,6 +23,16 @@ def create_tables():
             execution_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS model_training_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        model_version TEXT,
+        accuracy REAL,
+        trigger_reason TEXT,
+        training_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
 
     # Closed-loop feedback table
     cursor.execute("""
@@ -80,6 +90,30 @@ def save_decision(
 
     return decision_id
 
+def save_training_history(
+    model_version,
+    accuracy,
+    trigger_reason
+):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO model_training_history
+        (
+            model_version,
+            accuracy,
+            trigger_reason
+        )
+        VALUES (?, ?, ?)
+    """, (
+        model_version,
+        accuracy,
+        trigger_reason
+    ))
+
+    conn.commit()
+    conn.close()
 
 def save_feedback(
     decision_id,
