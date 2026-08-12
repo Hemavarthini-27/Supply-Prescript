@@ -7,97 +7,66 @@
     <title>Supply Prescript Dashboard</title>
 
     <style>
-        body{
-             margin:0;
-             padding:30px;
-             font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-             background:#0f172a;
-             color:#ffffff;
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
         }
 
-        h1{
-            text-align:center;
-            color:#ffffff;
-            font-size:40px;
-            margin-bottom:30px;
-        }
-        h2{
-            color:white;
-            margin-bottom:25px;
+        h1 {
+            text-align: center;
+            color: #222;
         }
 
-        h3{
-             color:white;
+        .container {
+            max-width: 900px;
+            margin: auto;
         }
 
-        .container{
-            max-width:1400px;
-            margin:auto;
+        .card {
+            background: white;
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .card{
-            background:#1e293b;
-            padding:30px;
-            margin-top:25px;
-            border-radius:18px;
-            border:1px solid #334155;
-            box-shadow:0 15px 30px rgba(0,0,0,.35);
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
         }
 
-        label{
-            display:block;
-            margin-top:15px;
-            margin-bottom:6px;
-            color:#cbd5e1;
-            font-weight:600;
-            font-size:14px;
-        }
-        input,
-        select{
-            idth:100%;
-            padding:12px 15px;
-            background:#0f172a;
-            color:white;
-            border:1px solid #334155;
-            border-radius:10px;
-            font-size:15px;
-            transition:.3s;
-            box-sizing:border-box;
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
         }
 
-        input:focus,
-        select:focus{
-            outline:none;
-            border-color:#3b82f6;
-            box-shadow:0 0 10px rgba(59,130,246,.35);
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
         }
 
-        button{
-            width:100%;
-            padding:14px;
-            margin-top:25px;
-            border:none;
-            border-radius:12px;
-            background:linear-gradient(90deg,#7c3aed,#2563eb);
-            color:white;
-            font-size:16px;
-            font-weight:600;
-            cursor:pointer;
-            transition:.3s;
+        button:hover {
+            background: #1d4ed8;
         }
 
-        button:hover{
-            transform:translateY(-2px);
-            box-shadow:0 10px 25px rgba(59,130,246,.45);
-        }
-
-        #result{
-            display:none;
-            margin-top:25px;
-            padding:20px;
-            border-radius:15px;
-            background:#172554;
-            border:1px solid #2563eb;
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eef6ff;
+            border-radius: 6px;
+            display: none;
         }
 
         .low-risk {
@@ -114,43 +83,37 @@
            color: red;
            font-weight: bold;
 }
-        .recommendation-card{
-            margin-top:20px;
-            padding:18px;
-            background:#fef3c7;
-            border-left:5px solid #f59e0b;
-            border-radius:10px;
-            color:#111827;
-        }
+        .recommendation-card {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 5px solid orange;
+            background-color: #fff3cd;
+            border-radius: 6px;
+}
 
-        .recommendation-card h3,
-        .recommendation-card strong,
-        .recommendation-card p{
-            color:#111827;
-        }
+        .recommendation-card strong {
+            font-size: 18px;
+}
 
-        .recommendation-card strong{
-            font-size:18px;
-        }
+        .recommendation-card p {
+            margin-top: 8px;
+            margin-bottom: 0;
+}
+        .optimization-card {
+            margin-top: 20px;
+            padding: 18px;
+            background-color: #e8f5e9;
+            border-left: 5px solid green;
+            border-radius: 6px;
+}
 
-        .recommendation-card p{
-            margin-top:8px;
-            margin-bottom:0;
-        }
-        .optimization-card{
-            margin-top:20px;
-            padding:20px;
-            background:#dcfce7;
-            border-left:5px solid #16a34a;
-            border-radius:10px;
-            color:#111827;
-        }
+        .optimization-card h3 {
+            margin-top: 0;
+}
 
-        .optimization-card h3,
-        .optimization-card p,
-        .optimization-card strong{
-            color:#111827;
-        }
+        .optimization-card p {
+            margin: 8px 0;
+}
         .execute-btn {
             margin-top: 15px;
             padding: 10px 18px;
@@ -171,32 +134,36 @@
             font-weight: bold;
 }
         .alternatives-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
 }
 
-        .alternative-card{
-            background:#ffffff;
-            color:#111827;
-            padding:15px;
-            border-radius:10px;
-            border:1px solid #cbd5e1;
+.alternative-card {
+    padding: 15px;
+    background: #f8fafc;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
 }
 
-        .alternative-card h4,
-        .alternative-card p{
-            color:#111827;
+.alternative-card h4 {
+    margin-top: 0;
+    font-size: 17px;
 }
 
-.alternative-card.recommended{
-    background:#dcfce7;
-    border:2px solid #22c55e;
+.alternative-card p {
+    margin: 8px 0;
 }
-.alternative-card.infeasible{
-    background:#fee2e2;
-    border:2px solid #ef4444;
+
+.alternative-card.recommended {
+    border: 3px solid green;
+    background-color: #e8f5e9;
+}
+
+.alternative-card.infeasible {
+    border: 2px solid #dc2626;
+    background-color: #fee2e2;
 }
 
 @media (max-width: 800px) {
@@ -233,15 +200,6 @@
     .analytics-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-}
-#analyticsResult{
-    color:#111827;
-}
-
-#analyticsResult h3,
-#analyticsResult p,
-#analyticsResult strong{
-    color:#111827;
 }
     </style>
 </head>
