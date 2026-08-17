@@ -4,35 +4,6 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual Environment
-venv/
-.env
-
-# Jupyter Notebook
-.ipynb_checkpoints/
-
-# VS Code
-.vscode/
-
-# Data Files
-# Processed data only
-data/processed/
-
-# ML Models
-models/*.pkl
-
-# Logs
-*.log
-
-# OS Files
-.DS_Store
-Thumbs.db
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-
 # Virtual environment
 venv/
 .venv/
@@ -44,5 +15,21 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
-# Generated decision output
-data/processed/executed_decisions.csv
+# VS Code
+.vscode/
+
+# Processed/generated data
+data/processed/
+
+# Local frontend
+frontend/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.
+
+# Trained ML models
+models/*.pkl
