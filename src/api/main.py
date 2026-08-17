@@ -195,6 +195,59 @@ def predict_delay(data: dict):
         "optimization": optimization
     }
 
+@app.post("/evaluate-decision")
+def evaluate_decision(data: dict):
+
+    decision_id = data["decision_id"]
+    actual_delay = data["actual_delay"]
+    actual_cost = data["actual_cost"]
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            shipment_id,
+            predicted_delay,
+            predicted_cost
+        FROM executed_decisions
+        WHERE id = ?
+    """, (decision_id,))
+
+    decision = cursor.fetchone()
+    conn.close()
+
+    if not decision:
+        return {
+            "error": "Decision not found"
+        }
+
+    shipment_id = decision[0]
+    predicted_delay = decision[1]
+    predicted_cost = decision[2]
+
+    feedback = save_feedback(
+        decision_id=decision_id,
+        shipment_id=shipment_id,
+        predicted_delay=predicted_delay,
+        actual_delay=actual_delay,
+        predicted_cost=predicted_cost,
+        actual_cost=actual_cost
+    )
+
+    return {
+        "message": "Decision evaluated successfully",
+        "decision_id": decision_id,
+        "shipment_id": shipment_id,
+        "predicted_delay": predicted_delay,
+        "actual_delay": actual_delay,
+        "predicted_cost": predicted_cost,
+        "actual_cost": actual_cost,
+        "outcome": feedback["outcome"],
+        "delay_difference": feedback["delay_difference"],
+        "cost_difference": feedback["cost_difference"]
+    }
+
 @app.post("/execute-decision")
 def execute_decision(data: dict):
 
@@ -223,17 +276,18 @@ def execute_decision(data: dict):
             index=False
         )
         # Save decision to SQLite database
-    save_decision(
-        shipment_id=data["Shipment_ID"],
-        predicted_delay=data["Predicted_Delay"],
-        recommended_action=data["Recommended_Action"],
-        predicted_cost=data["Predicted_Cost"]
-    )
+    decision_id = save_decision(
+    shipment_id=data["Shipment_ID"],
+    predicted_delay=data["Predicted_Delay"],
+    recommended_action=data["Recommended_Action"],
+    predicted_cost=data["Predicted_Cost"]
+)
 
     return {
-        "message": "Decision executed and saved successfully!",
-        "decision": decision_record
-    }
+    "message": "Decision executed and saved successfully!",
+    "decision_id": decision_id,
+    "decision": decision_record
+}
 @app.get("/decision-analytics")
 def decision_analytics():
 
@@ -375,6 +429,46 @@ def evaluate_decision(data: dict):
         "cost_difference": feedback["cost_difference"],
         "outcome": feedback["outcome"]
     }
+    
+@app.get("/decision-history")
+def decision_history():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            shipment_id,
+            predicted_delay,
+            recommended_action,
+            predicted_cost,
+            execution_date
+        FROM executed_decisions
+        ORDER BY id DESC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    history = []
+
+    for row in rows:
+        history.append({
+            "decision_id": row[0],
+            "shipment_id": row[1],
+            "predicted_delay": row[2],
+            "recommended_action": row[3],
+            "predicted_cost": row[4],
+            "execution_date": row[5]
+        })
+
+    return {
+        "total_decisions": len(history),
+        "decisions": history
+    }
+
+    
 @app.get("/feedback-analytics")
 def feedback_analytics():
 
