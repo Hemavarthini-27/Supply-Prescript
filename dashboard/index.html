@@ -136,20 +136,29 @@ select{
             margin-top:8px;
             margin-bottom:0;
         }
-        .optimization-card{
-            margin-top:20px;
-            padding:20px;
-            background:#dcfce7;
-            border-left:5px solid #16a34a;
-            border-radius:10px;
-            color:#111827;
-        }
+        .optimization-card {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f0fdf4;
+    border-left: 5px solid #16a34a;
+    border-radius: 10px;
+    color: #111827;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
 
-        .optimization-card h3,
-        .optimization-card p,
-        .optimization-card strong{
-            color:#111827;
-        }
+.optimization-card h3 {
+    color: #111827;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.optimization-card p {
+    color: #374151;
+}
+
+.optimization-card strong {
+    color: #111827;
+}
         .execute-btn {
             margin-top: 15px;
             padding: 10px 18px;
@@ -175,31 +184,56 @@ select{
     margin-top:20px;
     width:100%;
 }
-
-.alternative-card{
-    flex:1;
-    min-width:180px;
-    background:#ffffff;
-    color:#111827;
-    padding:15px;
-    border-radius:10px;
-    border:1px solid #cbd5e1;
-    box-sizing:border-box;
+.alternative-card {
+    flex: 1;
+    min-width: 180px;
+    background: #ffffff;
+    color: #111827;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.alternative-card h4,
-.alternative-card p{
-    color:#111827;
+.alternative-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
 }
 
-.alternative-card.recommended{
-    background:#dcfce7;
-    border:2px solid #22c55e;
+.alternative-card h4 {
+    color: #111827;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
-.alternative-card.infeasible{
-    background:#fee2e2;
-    border:2px solid #ef4444;
+.alternative-card p {
+    color: #4b5563;
+    margin: 7px 0;
+}
+
+.alternative-card strong {
+    color: #111827;
+}
+
+/* Recommended option */
+.alternative-card.recommended {
+    background: #ecfdf5;
+    border: 2px solid #22c55e;
+}
+
+.alternative-card.recommended h4 {
+    color: #166534;
+}
+
+/* Infeasible option */
+.alternative-card.infeasible {
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+}
+
+.alternative-card.infeasible h4 {
+    color: #991b1b;
 }
 
 @media (max-width: 800px) {
@@ -215,21 +249,76 @@ select{
 }
 
 .analytics-item {
-    background: #f8fafc;
-    padding: 18px;
-    border-radius: 8px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
     text-align: center;
     border: 1px solid #d1d5db;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analytics-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
 }
 
 .analytics-item h3 {
     margin: 0;
-    font-size: 24px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
 }
 
 .analytics-item p {
-    margin-bottom: 0;
-    color: #555;
+    margin: 8px 0 0;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Different colors for each metric */
+
+.analytics-item:nth-child(1) h3 {
+    color: #2563eb;
+}
+
+.analytics-item:nth-child(2) h3 {
+    color: #16a34a;
+}
+
+.analytics-item:nth-child(3) h3 {
+    color: #d97706;
+}
+
+.analytics-item:nth-child(4) h3 {
+    color: #dc2626;
+}
+
+.analytics-item:nth-child(5) h3 {
+    color: #7c3aed;
+}
+
+.analytics-item:nth-child(6) h3 {
+    color: #0891b2;
+}
+
+.analytics-item:nth-child(7) h3 {
+    color: #9333ea;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 800px) {
@@ -349,6 +438,247 @@ grid-template-columns:1fr;
     }
 }
 
+/* ==============================
+   DECISION HISTORY - READABILITY
+   ============================== */
+
+.history-container {
+    background: #ffffff;
+    color: #1f2937;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.history-container h3 {
+    color: #111827;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #ffffff;
+    color: #1f2937;
+}
+
+.history-table th {
+    background: #4f46e5;
+    color: #ffffff;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.history-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+    background: #ffffff;
+}
+
+.history-table tr:nth-child(even) td {
+    background: #f8fafc;
+}
+
+.history-table tr:hover td {
+    background: #eef2ff;
+}
+
+/* Decision ID */
+.history-table td:first-child {
+    font-weight: 600;
+    color: #4f46e5;
+}
+
+/* Recommended Action */
+.history-table td:nth-child(4) {
+    color: #047857;
+    font-weight: 600;
+}
+
+/* Cost */
+.history-table td:nth-child(5) {
+    font-weight: 600;
+    color: #b45309;
+}
+
+/* Execution date */
+.history-table td:last-child {
+    color: #6b7280;
+}
+
+
+/* ==============================
+   EVALUATION CARD
+   ============================== */
+
+.evaluation-card {
+    background: #ffffff;
+    color: #1f2937;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.evaluation-card h3 {
+    color: #111827;
+}
+
+.evaluation-card label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    color: #374151;
+    font-weight: 600;
+}
+
+.evaluation-card input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #111827;
+}
+
+.evaluation-card input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+
+/* ==============================
+   EVALUATION RESULT
+   ============================== */
+
+#evaluationResult {
+    margin-top: 15px;
+    color: #1f2937;
+}
+
+#evaluationResult .success {
+    background: #dcfce7;
+    color: #166534;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+#evaluationResult .warning {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+#evaluationResult .danger {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* Prediction Result readability */
+#result {
+    color: #1f2937 !important;
+}
+
+#result h3 {
+    color: #111827 !important;
+    font-size: 18px;
+}
+
+#result p {
+    color: #374151 !important;
+    font-weight: 500;
+}
+
+#result p strong {
+    color: #111827 !important;
+}
+
+/* Prediction label */
+#result .prediction-label {
+    font-weight: 700;
+    color: #2563eb !important;
+}
+
+/* Delay probability */
+#result .delay-probability {
+    font-weight: 700;
+    color: #7c3aed !important;
+}
+
+/* Risk levels */
+#result .low-risk {
+    color: #15803d !important;
+    font-weight: 800;
+}
+
+#result .medium-risk {
+    color: #d97706 !important;
+    font-weight: 800;
+}
+
+#result .high-risk {
+    color: #dc2626 !important;
+    font-weight: 800;
+}
+
+.history-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 12px;
+}
+
+.history-container h3 {
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.history-total {
+    color: #cbd5e1;
+    margin-bottom: 15px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f8fafc;
+    color: #1e293b;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.history-table th {
+    background: #334155;
+    color: #ffffff;
+    padding: 12px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.history-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid #cbd5e1;
+    white-space: nowrap;
+}
+
+.history-table tbody tr:hover {
+    background: #e2e8f0;
+}
+
+.history-table td strong {
+    color: #2563eb;
+}
     </style>
 </head>
 
@@ -597,13 +927,17 @@ resultBox.innerHTML = `
     <h3>Prediction Result</h3>
 
     <p>
-        <strong>Prediction:</strong>
-        ${result.prediction_label}
+       <strong>Prediction:</strong>
+<span class="prediction-label">
+    ${result.prediction_label}
+</span>
     </p>
 
     <p>
-        <strong>Delay Probability:</strong>
-        ${delayProbability.toFixed(2)}%
+      <strong>Delay Probability:</strong>
+<span class="delay-probability">
+    ${delayProbability.toFixed(2)}%
+</span>
     </p>
 
     <p>
@@ -728,12 +1062,16 @@ document.getElementById("executeDecisionBtn").addEventListener("click", async ()
             throw new Error("Failed to execute decision");
         }
 
-        const executionResult = await response.json();
+       const executionResult = await response.json();
 
-        message.textContent =
-            "✓ Decision executed and saved successfully!";
+message.innerHTML = `
+    ✓ Decision executed and saved successfully!
+    <br>
+    <strong>Decision ID:</strong>
+    ${executionResult.decision_id}
+`;
 
-        button.textContent = "Decision Executed";
+button.textContent = "Decision Executed";
 
     } catch (error) {
 
@@ -805,18 +1143,71 @@ async function loadDecisionAnalytics() {
             <div class="card">
 
                 <h2>🔄 Closed-Loop Decision Performance</h2>
+                <div class="card">
+
+    <h2>📋 Decision History</h2>
+
+    <button
+        type="button"
+        onclick="loadDecisionHistory()"
+    >
+        Load Decision History
+    </button>
+
+    <div id="decisionHistory">
+        Click the button to view executed decisions.
+    </div>
+
+</div>
 
                 <div id="feedbackAnalytics">
                     Loading feedback analytics...
                 </div>
+                 
+                <div class="evaluation-card">
 
+    <h3>📊 Evaluate Executed Decision</h3>
+
+    <label>Decision ID</label>
+    <input
+        type="number"
+        id="evaluationDecisionId"
+        placeholder="Enter decision ID"
+    >
+
+    <label>Actual Delay (days)</label>
+    <input
+        type="number"
+        id="actualDelay"
+        step="0.1"
+        placeholder="Enter actual delay"
+    >
+
+    <label>Actual Cost (£)</label>
+    <input
+        type="number"
+        id="actualCost"
+        step="0.01"
+        placeholder="Enter actual cost"
+    >
+
+    <button
+        type="button"
+        onclick="evaluateDecision()"
+    >
+        Evaluate Decision
+    </button>
+
+    <div id="evaluationResult"></div>
+
+</div>
                 <br>
 
                <button type="button" onclick="retrainModel()">
     🔄 Retrain Model
 </button>
-                <div id="retrainResult"></div>
 
+<div id="retrainResult"></div>
             </div>
 
         `;
@@ -905,13 +1296,132 @@ async function loadFeedbackAnalytics() {
     }
 }
 
+async function evaluateDecision() {
+
+    const decisionId =
+        Number(document.getElementById("evaluationDecisionId").value);
+
+    const actualDelay =
+        Number(document.getElementById("actualDelay").value);
+
+    const actualCost =
+        Number(document.getElementById("actualCost").value);
+
+    const resultBox =
+        document.getElementById("evaluationResult");
+
+    if (!decisionId || actualDelay < 0 || actualCost < 0) {
+
+        resultBox.innerHTML = `
+            <p style="color:#f87171;">
+                Please enter valid evaluation details.
+            </p>
+        `;
+
+        return;
+    }
+
+    resultBox.innerHTML = "Evaluating decision...";
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/evaluate-decision",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    decision_id: decisionId,
+                    actual_delay: actualDelay,
+                    actual_cost: actualCost
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || data.error || "Evaluation failed"
+            );
+        }
+
+        resultBox.innerHTML = `
+            <div class="recommendation-card">
+
+                <h4>✅ Decision Evaluated</h4>
+
+                <p>
+                    <strong>Outcome:</strong>
+                    ${data.outcome}
+                </p>
+
+                <p>
+                    <strong>Delay Difference:</strong>
+                    ${data.delay_difference} days
+                </p>
+
+                <p>
+                    <strong>Cost Difference:</strong>
+                    £${Number(
+                        data.cost_difference
+                    ).toLocaleString()}
+                </p>
+
+            </div>
+        `;
+
+        // Refresh Closed-Loop Analytics
+        await loadFeedbackAnalytics();
+
+        // Clear inputs
+        document.getElementById(
+            "evaluationDecisionId"
+        ).value = "";
+
+        document.getElementById(
+            "actualDelay"
+        ).value = "";
+
+        document.getElementById(
+            "actualCost"
+        ).value = "";
+
+    } catch (error) {
+
+        console.error(error);
+
+        resultBox.innerHTML = `
+            <p style="color:#f87171;">
+                ❌ ${error.message}
+            </p>
+        `;
+    }
+}
+
 async function retrainModel() {
 
     console.log("Retrain button clicked");
 
-    try {
+    const resultBox = document.getElementById("retrainResult");
 
-        
+    if (!resultBox) {
+        console.error("retrainResult not found");
+        return;
+    }
+
+    resultBox.innerHTML = `
+        <div class="optimization-card">
+            <h3>🔄 Retraining Model...</h3>
+            <p>Please wait...</p>
+        </div>
+    `;
+
+    try {
 
         const response = await fetch(
             "http://127.0.0.1:8000/retrain-model",
@@ -920,7 +1430,7 @@ async function retrainModel() {
             }
         );
 
-        
+        console.log("Response status:", response.status);
 
         if (!response.ok) {
             throw new Error("Retraining failed");
@@ -928,39 +1438,150 @@ async function retrainModel() {
 
         const data = await response.json();
 
-        console.log("Data:", data);
-        console.log("Displaying retrain result");
+        console.log("Retrain response:", data);
 
-        document.getElementById("retrainResult").innerHTML = `
+        resultBox.innerHTML = `
             <div class="optimization-card">
+
                 <h3>✅ Model Retrained Successfully</h3>
 
-                <p><strong>Version:</strong> ${data.model_version}</p>
+                <p>
+                    <strong>Version:</strong>
+                    ${data.model_version}
+                </p>
 
-                <p><strong>Accuracy:</strong> ${data.accuracy}%</p>
+                <p>
+                    <strong>Accuracy:</strong>
+                    ${data.accuracy}%
+                </p>
 
-                <p>${data.message}</p>
+                <p>
+                    ${data.message}
+                </p>
+
+            </div>
+        `;
+
+        console.log("Retrain result displayed");
+
+    } catch (error) {
+
+        console.error("Retrain Error:", error);
+
+        resultBox.innerHTML = `
+            <div class="recommendation-card">
+
+                <h3>❌ Retrain Failed</h3>
+
+                <p>${error.message}</p>
+
+            </div>
+        `;
+    }
+}
+
+async function loadDecisionHistory() {
+
+    const historyBox = document.getElementById("decisionHistory");
+
+    historyBox.innerHTML = "Loading decision history...";
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/decision-history"
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to load decision history");
+        }
+
+        const data = await response.json();
+
+        if (data.decisions.length === 0) {
+            historyBox.innerHTML = "<p>No executed decisions found.</p>";
+            return;
+        }
+
+        historyBox.innerHTML = `
+
+            <div class="history-container">
+
+                <h3>📋 Decision History</h3>
+
+                <p class="history-total">
+                    <strong>Total Decisions:</strong>
+                    ${data.total_decisions}
+                </p>
+
+                <div class="table-wrapper">
+
+                    <table class="history-table">
+
+                        <thead>
+                            <tr>
+                                <th>Decision ID</th>
+                                <th>Shipment ID</th>
+                                <th>Predicted Delay</th>
+                                <th>Recommended Action</th>
+                                <th>Predicted Cost</th>
+                                <th>Execution Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            ${data.decisions.map(decision => `
+
+                                <tr>
+
+                                    <td>
+                                        <strong>#${decision.decision_id}</strong>
+                                    </td>
+
+                                    <td>
+                                        ${decision.shipment_id}
+                                    </td>
+
+                                    <td>
+                                        ${decision.predicted_delay} days
+                                    </td>
+
+                                    <td>
+                                        ${decision.recommended_action}
+                                    </td>
+
+                                    <td>
+                                        £${Number(
+                                            decision.predicted_cost
+                                        ).toLocaleString()}
+                                    </td>
+
+                                    <td>
+                                        ${decision.execution_date}
+                                    </td>
+
+                                </tr>
+
+                            `).join('')}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
         `;
 
     } catch (error) {
 
-    console.error("Retrain Error:", error);
-    alert(error);
+        console.error(error);
 
-    document.getElementById("retrainResult").innerHTML = `
-        <div class="recommendation-card">
-            <h3>❌ Retrain Failed</h3>
-            <p>${error.message}</p>
-        </div>
-    `;
-
-
+        historyBox.innerHTML =
+            "<p>Unable to load decision history.</p>";
     }
-
 }
-
 </script>
 
 </body>
